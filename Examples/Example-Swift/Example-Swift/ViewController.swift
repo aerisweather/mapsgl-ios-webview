@@ -62,12 +62,12 @@ extension ViewController: MapsGLViewDelegate {
 //                ]
 //            ]
 //        ])
-        mapView.addWeatherLayer("temperatures")
+        mapView.addWeatherLayer("wind-dir")
 //        mapView.addWeatherLayer("wind-particles")
         mapView.getBounds()
         
 //        mapView.setCenter(CLLocationCoordinate2D(latitude: 47.5, longitude: -121.5))
-//        mapView.setZoom(0)
+        mapView.setZoom(0)
         
 //        let delay = DispatchTime.now() + 3.0
 //        DispatchQueue.main.asyncAfter(deadline: delay, execute: {

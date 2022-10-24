@@ -14,65 +14,6 @@ public enum MapViewError: Error {
     case invalidPath
 }
 
-public struct MapsGLAccount {
-    public let id: String
-    public let secret: String
-    
-    public init(id: String, secret: String) {
-        self.id = id
-        self.secret = secret
-    }
-}
-
-public struct MapsGLAnimationOptions {
-    public var start: Date
-    public var end: Date
-    public var duration: TimeInterval
-    public var delay: TimeInterval
-    public var endDelay: TimeInterval
-    public var autoplay: Bool
-    public var enableRepeat: Bool
-    public var enabled: Bool
-    
-    private let dateFormatter = DateFormatter()
-    
-    public init() {
-        self.start = Date()
-        self.end = Date().addingTimeInterval(-24 * 3600)
-        self.duration = 4.0
-        self.delay = 0
-        self.endDelay = 1.0
-        self.autoplay = false
-        self.enableRepeat = true
-        self.enabled = true
-    }
-    
-    public func toDictionary() -> [String: Any] {
-        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ"
-        
-        return [
-            "start": dateFormatter.string(from: start),
-            "end": dateFormatter.string(from: end),
-            "duration": duration,
-            "delay": delay,
-            "endDelay": endDelay,
-            "repeat": enableRepeat,
-            "enabled": enabled,
-            "autoplay": autoplay
-        ]
-    }
-}
-
-public struct MapsGLConfiguration {
-    public let account: MapsGLAccount
-    public var animation: MapsGLAnimationOptions
-    
-    public init(account: MapsGLAccount) {
-        self.account = account
-        self.animation = MapsGLAnimationOptions()
-    }
-}
-
 @objc public protocol MapsGLViewDelegate: AnyObject {
     @objc optional func mapsglViewDidLoad(mapView: MapsGLView)
     @objc optional func onReady()
@@ -97,10 +38,10 @@ public typealias MapsGLLayerOptions = [String: Any]
 public class MapsGLView: UIView {
     public var configuration: MapsGLConfiguration
     public let webView = WKWebView(frame: CGRect(), configuration: WKWebViewConfiguration())
-    var bridge: WKWebViewJavascriptBridge!
     public weak var delegate: MapsGLViewDelegate?
-    
     public var isAnimating = false
+    
+    private var bridge: WKWebViewJavascriptBridge!
     private let dateFormatter = DateFormatter()
     
     convenience public init(config: MapsGLConfiguration, frame: CGRect) {

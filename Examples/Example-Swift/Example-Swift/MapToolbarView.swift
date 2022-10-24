@@ -32,6 +32,7 @@ class MapToolbarView: UIView {
         
         timeLabel.font = .preferredFont(forTextStyle: .callout)
         timeLabel.textColor = .white
+        timeLabel.textAlignment = .right
         timeLabel.translatesAutoresizingMaskIntoConstraints = false
         addSubview(timeLabel)
         
@@ -42,7 +43,8 @@ class MapToolbarView: UIView {
             activityIndicator.centerYAnchor.constraint(equalTo: centerYAnchor),
             timeLabel.leftAnchor.constraint(equalTo: activityIndicator.rightAnchor, constant: 12),
             timeLabel.rightAnchor.constraint(equalTo: layoutMarginsGuide.rightAnchor),
-            timeLabel.centerYAnchor.constraint(equalTo: centerYAnchor)
+            timeLabel.centerYAnchor.constraint(equalTo: centerYAnchor),
+            timeLabel.widthAnchor.constraint(equalToConstant: 165)
         ])
     }
     
