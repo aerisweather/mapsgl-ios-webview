@@ -1,0 +1,311 @@
+<!doctype html>
+<html>
+<head>
+    <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <style type='text/css'>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        #app {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #000;
+            height: 100%;
+            width: 100%;
+            z-index: 1;
+        }
+        #legend {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            display: none;
+            z-index: 2;
+            background: rgba(255,0,0,0.5);
+        }
+    </style>
+
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.8.0/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.8.0/mapbox-gl.js"></script>
+
+    <link rel="stylesheet" href="https://cdn.aerisapi.com/sdk/js/mapsgl/1.1.0/aerisweather.mapsgl.css">
+    <script src="https://cdn.aerisapi.com/sdk/js/mapsgl/1.1.0/aerisweather.mapsgl.js"></script>
+</head>
+
+<body>
+    <div id="app"></div>
+    <div id="legend"></div>
+    <h1>AerisWeather MapsGL</h1>
+    <script>
+        let controller;
+
+        window.onerror = function (err) {
+            log('window.onerror: ' + err)
+        }
+
+        function setupWKWebViewJavascriptBridge(callback) {
+            if (window.WKWebViewJavascriptBridge) {
+                return callback(WKWebViewJavascriptBridge);
+            }
+            if (window.WKWVJBCallbacks) {
+                return window.WKWVJBCallbacks.push(callback);
+            }
+            window.WKWVJBCallbacks = [callback];
+            window.webkit.messageHandlers.iOS_Native_InjectJavascript.postMessage(null)
+        }
+
+        const unproject = (x, y, zoom, center, size) => {
+            const _scale = (zoom) => 256 * 0.5 / Math.PI * (2 ** zoom);
+            const _offset = (coord, zoom, size) => {
+                const pi = Math.PI;
+                const scale = 256 * 0.5 / pi * (2 ** zoom);
+
+                const lat = coord.lat * (Math.PI / 180);
+                const lon = coord.lon * (Math.PI / 180);
+                const x = scale * (lon + pi);
+                const y = scale * (pi - Math.log(Math.tan(pi * 0.25 + lat * 0.5)));
+
+                return {
+                    x: (size.width * 0.5 - x), y: (size.height * 0.5 - y)
+                };
+            };
+
+            const pi = Math.PI;
+            const scale = _scale(zoom);
+
+            const offset = (center && size) ? _offset(center, zoom, size) : {
+                x: 0, y: 0
+            };
+            const x2 = x - offset.x;
+            const y2 = y - offset.y;
+
+            const lon = x2 / scale - pi;
+            const lat = 2 * (Math.atan(Math.exp(pi - y2 / scale)) - pi * 0.25);
+
+            return {
+                lat: lat * (180 / Math.PI), lon: lon * (180 / Math.PI)
+            };
+        };
+
+        setupWKWebViewJavascriptBridge(function (bridge) {
+            var uniqueId = 1
+            const dispatch = (handler, payload) => {
+                bridge.callHandler(handler, payload);
+            };
+
+            const log = (message, data, type) => {
+                bridge.callHandler('log', { message, data, type });
+            };
+
+            mapboxgl.accessToken = 'pk.eyJ1IjoidTEwaW50IiwiYSI6InQtMnZvTkEifQ.c8mhXquPE7_xoB3P4Ag8cA';
+            const map = new mapboxgl.Map({
+                container: document.getElementById('app'),
+                style: 'mapbox://styles/mapbox/light-v9',
+                center: [-94.5, 35],
+                zoom: 3
+            });
+
+
+            const target = document.getElementById('app');
+            target.addEventListener('click', (e) => {
+                const x = e.clientX - target.clientLeft;
+                const y = e.clientY - target.clientTop;
+                const size = { width: target.clientWidth, height: target.clientHeight };
+                const coord = unproject(x, y, controller.getZoom(), controller.getCenter(), size)
+                bridge.callHandler('onMapClick', { point: { x, y }, coord });
+            });
+            
+            // Core map functionality
+
+            bridge.registerHandler('getCenter', (data, responseCallback) => {
+                log('setCenter', controller.getCenter());
+                responseCallback(controller.getCenter());
+            });
+            bridge.registerHandler('setCenter', (data, responseCallback) => {
+                const { lat, lon } = data;
+                log('setCenter', lat, lon);
+                controller.setCenter({ lat: parseFloat(lat), lon: parseFloat(lon) });
+            });
+            bridge.registerHandler('getZoom', (data, responseCallback) => {
+                log('getZoom', controller.getZoom());
+                responseCallback(controller.getZoom());
+            });
+            bridge.registerHandler('setZoom', (data, responseCallback) => {
+                const { zoom } = data;
+                log('setZoom', zoom);
+                controller.setZoom(zoom);
+            });
+            bridge.registerHandler('getBounds', (data, responseCallback) => {
+                responseCallback(controller.getBounds());
+            });
+            bridge.registerHandler('getBearing', (data, responseCallback) => {
+                responseCallback(controller.getBearing());
+            });
+            bridge.registerHandler('getPitch', (data, responseCallback) => {
+                responseCallback(controller.getPitch());
+            });
+            bridge.registerHandler('getFov', (data, responseCallback) => {
+                responseCallback(controller.getFov());
+            });
+
+            bridge.registerHandler('timeline.startDate', (data, responseCallback) => {
+                log('startDate', controller.timeline.startDate)
+                responseCallback(controller.timeline.startDate);
+            });
+            bridge.registerHandler('timeline.endDate', (data, responseCallback) => {
+                log('endDate', controller.timeline.endDate)
+                responseCallback(controller.timeline.endDate);
+            });
+            bridge.registerHandler('timeline.currentDate', (data, responseCallback) => {
+                log('currentDate', controller.timeline.currentDate)
+                responseCallback(controller.timeline.currentDate);
+            });
+
+            bridge.registerHandler('configureMap', (data, responseCallback) => {
+                log('setting up map', data);
+                const { account: accountConfig, animation: animationConfig = {} } = data;
+                const account = new aerisweather.mapsgl.Account(accountConfig.id, accountConfig.secret);
+
+                // if (animationConfig.start) {
+                //     animationConfig.start = new Date(animationConfig.start);    
+                // }
+                // if (animationConfig.end) {
+                //     animationConfig.end = new Date(animationConfig.end);    
+                // }
+                // animationConfig.enabled = Boolean(animationConfig.enabled);
+                // animationConfig.repeat = Boolean(animationConfig.repeat);
+                // animationConfig.autoplay = Boolean(animationConfig.autoplay);
+
+                controller = new aerisweather.mapsgl.MapboxMapController(map, { account, animation: animationConfig });
+                controller.addLegendControl(document.getElementById('legend'), {
+                    width: 300
+                });
+
+                controller.on('load', () => {
+                    log('MapsGL controller ready');
+                    bridge.callHandler('onReady', {
+                        timeline: {
+                            start: timeline.startDate.toString(),
+                            end: timeline.endDate.toString()
+                        }
+                    });
+                });
+
+                controller.on('click', (e) => {
+                    const features = map.query(e.coord);
+                    log('click', features);
+                    bridge.callHandler('onMapClick', { features });
+                });
+                controller.on('zoom', (e) => {
+                    bridge.callHandler('onZoom');
+                });
+                controller.on('move', (e) => {
+                    bridge.callHandler('onMove');
+                });
+                controller.on('load:start', (e) => {
+                    bridge.callHandler('onLoadStart');
+                });
+                controller.on('load:complete', (e) => {
+                    bridge.callHandler('onLoadComplete');
+                });
+
+                controller.on('source:add', (e) => {
+                    bridge.callHandler('onAddSource');
+                });
+                controller.on('layer:add', (e) => {
+                    bridge.callHandler('onAddLayer');
+                });
+                controller.on('remove:add', (e) => {
+                    bridge.callHandler('onRemoveSource');
+                });
+                controller.on('remove:add', (e) => {
+                    bridge.callHandler('onRemoveLayer');
+                });
+                
+                const timeline = controller.timeline;
+                timeline.on('play', () => {
+                    bridge.callHandler('onAnimationStart');
+                });
+                timeline.on('stop', () => {
+                    bridge.callHandler('onAnimationStop');
+                });
+                timeline.on('pause', () => {
+                    bridge.callHandler('onAnimationPause');
+                });
+                timeline.on('resume', () => {
+                    bridge.callHandler('onAnimationResume');
+                });
+                timeline.on('advance', ({ position, date }) => {
+                    log('advance');
+                    bridge.callHandler('onAnimationAdvance', { position, date });
+                });
+            });
+
+            bridge.registerHandler('getLegend', (data, responseCallback) => {
+                const target = document.getElementById('legend');
+                const items = [];
+                const children = target.querySelectorAll('.awxgl-legend-container');
+                children.forEach((node, i) => {
+                    const key = node.getAttribute('id').replace(/^awxgl-legend-/, '');
+                    const label = node.querySelector('.awxgl-legend-title').innerHTML;
+                    const canvas = node.querySelector('canvas');
+                    // log('legend', { index: i, key, label, width: canvas.width, height: canvas.height });
+                    const data = canvas.toDataURL('image/png');
+                    items.push({ key, label, data: data.replace(/^.+base64,/, '') });
+                });
+                responseCallback(items);
+            });
+
+            // Weather layers
+
+            bridge.registerHandler('addWeatherLayer', (data, responseCallback) => {
+                const { layer, options = {} } = data;
+                controller.addWeatherLayer(layer, options)
+            });
+            bridge.registerHandler('removeWeatherLayer', (data, responseCallback) => {
+                const { layer } = data;
+                controller.removeWeatherLayer(layer)
+            });
+            bridge.registerHandler('query', (data, responseCallback) => {
+                log('query', data);
+                controller.queryPromise(data).then((result) => {
+                    responseCallback(result);
+                });
+            });
+
+            // Timeline controls
+
+            bridge.registerHandler('timeline.play', (data, responseCallback) => {
+                log('iOS - play', data);
+                controller.timeline.play();
+            });
+            bridge.registerHandler('timeline.pause', (data, responseCallback) => {
+                log('iOS - pause', data);
+                controller.timeline.pause();
+            });
+            bridge.registerHandler('timeline.resume', (data, responseCallback) => {
+                log('iOS - resume', data);
+                controller.timeline.resume();
+            });
+            bridge.registerHandler('timeline.stop', (data, responseCallback) => {
+                log('iOS - stop', data);
+                controller.timeline.stop();
+            });
+            bridge.registerHandler('timeline.restart', (data, responseCallback) => {
+                log('iOS - restart', data);
+                controller.timeline.restart();
+            });
+
+            bridge.callHandler('onLoad');
+        });
+    </script>
+    <div id='buttons'></div>
+    <div id='log'></div>
+</body>
+
+</html>

@@ -1,0 +1,14 @@
+{
+  "pins" : [
+    {
+      "identity" : "wkwebviewjavascriptbridge",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Lision/WKWebViewJavascriptBridge.git",
+      "state" : {
+        "branch" : "master",
+        "revision" : "51cdc110657e5ad469df712ca79632761d3fe11d"
+      }
+    }
+  ],
+  "version" : 2
+}
