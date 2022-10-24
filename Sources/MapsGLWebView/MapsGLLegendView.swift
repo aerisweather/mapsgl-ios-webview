@@ -91,4 +91,29 @@ public class MapsGLLegendView: UIView {
             legends[key] = legendItem
         }
     }
+    
+    public func removeLegend(key: String) {
+        if let legendItem = legends[key] {
+            stackView.removeArrangedSubview(legendItem)
+            legends[key] = nil
+        }
+    }
+    
+    public func updateLegends(data: [[String: Any]]) {
+        for view in stackView.arrangedSubviews {
+            stackView.removeArrangedSubview(view)
+        }
+        
+        if data.count > 0 {
+            for item in data {
+                guard let base64Str = item["data"] as? String,
+                      let imageData = Data(base64Encoded: base64Str),
+                      let image = UIImage(data: imageData),
+                      let key = item["key"] as? String,
+                      let label = item["label"] as? String else { return }
+                
+                addLegend(key: key, label: label, image: image)
+            }
+        }
+    }
 }

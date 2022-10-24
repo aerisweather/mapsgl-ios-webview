@@ -87,19 +87,26 @@ extension ViewController: MapsGLViewDelegate {
     
     func mapsglViewDidAddLayer(mapView: MapsGLView) {
         mapView.getLegend { [weak self] result in
-            if result.count > 0 {
-                for item in result {
-                    guard let base64Str = item["data"] as? String,
-                          let imageData = Data(base64Encoded: base64Str),
-                          let image = UIImage(data: imageData),
-                          let key = item["key"] as? String,
-                          let label = item["label"] as? String else { return }
-                    
-                    self?.legendView.addLegend(key: key, label: label, image: image)
-                }
+            if let data = result as? [[String: Any]] {
+                self?.legendView.updateLegends(data: data)
             }
-            
         }
+    }
+    
+    func mapsglViewDidRemoveLayer(mapView: MapsGLView) {
+        mapView.getLegend { [weak self] result in
+            if let data = result as? [[String: Any]] {
+                self?.legendView.updateLegends(data: data)
+            }
+        }
+    }
+    
+    func mapsglViewDidStartLoading(mapView: MapsGLView) {
+        toolbarView.activityIndicator.startAnimating()
+    }
+    
+    func mapsglViewDidCompleteLoading(mapView: MapsGLView) {
+        toolbarView.activityIndicator.stopAnimating()
     }
     
     func mapsglViewDidStartAnimating(mapView: MapsGLView) {
@@ -110,17 +117,8 @@ extension ViewController: MapsGLViewDelegate {
         toolbarView.playButton.isSelected = false
     }
     
-    func mapsglViewDidAdvanceAnimation(mapView: MapsGLView, progress: Float, date: Date) {
+    func mapsglViewDidAdvanceAnimation(mapView: MapsGLView, progress: Double, date: Date) {
         toolbarView.timeLabel.text = date.formatted()
     }
-    
-//    func mapsglViewDidMove(mapView: MapsGLView) {
-//        view.getCenter { center in
-//            print("center: \(center)")
-//        }
-//        view.getZoom { zoom in
-//            print("zoom: \(zoom)")
-//        }
-//    }
 }
 
