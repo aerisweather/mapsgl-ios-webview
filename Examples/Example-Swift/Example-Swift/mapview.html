@@ -241,7 +241,6 @@
                     bridge.callHandler('onAnimationResume');
                 });
                 timeline.on('advance', ({ position, date }) => {
-                    log('advance');
                     bridge.callHandler('onAnimationAdvance', { position, date });
                 });
             });

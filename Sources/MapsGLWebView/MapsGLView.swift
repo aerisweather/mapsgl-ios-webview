@@ -89,7 +89,7 @@ public struct MapsGLConfiguration {
     @objc optional func mapsglViewDidPauseAnimation(mapView: MapsGLView)
     @objc optional func mapsglViewDidResumeAnimation(mapView: MapsGLView)
     @objc optional func mapsglViewDidStopAnimating(mapView: MapsGLView)
-    @objc optional func mapsglViewDidAdvanceAnimation(mapView: MapsGLView, progress: Float, date: Date)
+    @objc optional func mapsglViewDidAdvanceAnimation(mapView: MapsGLView, progress: Double, date: Date)
 }
 
 public typealias MapsGLLayerOptions = [String: Any]
@@ -393,7 +393,7 @@ public class MapsGLView: UIView {
         }
         bridge.register(handlerName: "onAnimationAdvance") { [weak self] parameters, callback in
             guard let view = self else { return }
-            if let position = parameters?["position"] as? Float, let dateStr = parameters?["date"] as? String {
+            if let position = parameters?["position"] as? Double, let dateStr = parameters?["date"] as? String {
                 self?.dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ"
                 if let date = self?.dateFormatter.date(from: dateStr) {
                     self?.delegate?.mapsglViewDidAdvanceAnimation?(mapView: view, progress: position, date: date)
