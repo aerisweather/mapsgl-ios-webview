@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2B12FE2229070649004DA28D /* MapToolbarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B12FE2129070649004DA28D /* MapToolbarView.swift */; };
 		2B5998172906EABC00E5E5E2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B5998162906EABC00E5E5E2 /* AppDelegate.swift */; };
 		2B5998192906EABC00E5E5E2 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B5998182906EABC00E5E5E2 /* SceneDelegate.swift */; };
 		2B59981B2906EABC00E5E5E2 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B59981A2906EABC00E5E5E2 /* ViewController.swift */; };
@@ -19,6 +20,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		2B12FE2129070649004DA28D /* MapToolbarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapToolbarView.swift; sourceTree = "<group>"; };
 		2B5998132906EABC00E5E5E2 /* Example-Swift.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Example-Swift.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2B5998162906EABC00E5E5E2 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		2B5998182906EABC00E5E5E2 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -68,6 +70,7 @@
 				2B5998162906EABC00E5E5E2 /* AppDelegate.swift */,
 				2B5998182906EABC00E5E5E2 /* SceneDelegate.swift */,
 				2B59981A2906EABC00E5E5E2 /* ViewController.swift */,
+				2B12FE2129070649004DA28D /* MapToolbarView.swift */,
 				2B59985C2906FC4D00E5E5E2 /* mapview.html */,
 				2B59981C2906EABC00E5E5E2 /* Main.storyboard */,
 				2B59981F2906EABD00E5E5E2 /* Assets.xcassets */,
@@ -174,6 +177,7 @@
 				2B59981B2906EABC00E5E5E2 /* ViewController.swift in Sources */,
 				2B5998172906EABC00E5E5E2 /* AppDelegate.swift in Sources */,
 				2B5998192906EABC00E5E5E2 /* SceneDelegate.swift in Sources */,
+				2B12FE2229070649004DA28D /* MapToolbarView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
