@@ -31,6 +31,7 @@ class ViewController: UIViewController {
         legendView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(legendView)
         
+        toolbarView.playButton.isEnabled = false
         toolbarView.playButton.addTarget(mapView, action: #selector(MapsGLView.toggle), for: .touchUpInside)
         toolbarView.layersButton.addTarget(self, action: #selector(ViewController.showOptions), for: .touchUpInside)
         toolbarView.translatesAutoresizingMaskIntoConstraints = false
@@ -110,11 +111,12 @@ extension ViewController: MapsGLViewDelegate {
     func mapsglViewDidReceiveClick(mapView: MapsGLView, coordinate: CLLocationCoordinate2D) {
         print("clicked: \(coordinate)")
         mapView.query(coordinate: coordinate) { result in
-            print("query result: \(result)")
+            print("query result: \(String(describing: result))")
         }
     }
     
-    func mapsglViewDidAddLayer(mapView: MapsGLView) {
+    func mapsglViewDidUpdateLayers(mapView: MapsGLView) {
+        toolbarView.playButton.isEnabled = mapView.activeLayers.count > 0
         mapView.getLegend { [weak self] result in
             if let data = result as? [[String: Any]] {
                 self?.legendView.updateLegends(data: data)
@@ -122,12 +124,12 @@ extension ViewController: MapsGLViewDelegate {
         }
     }
     
-    func mapsglViewDidRemoveLayer(mapView: MapsGLView) {
-        mapView.getLegend { [weak self] result in
-            if let data = result as? [[String: Any]] {
-                self?.legendView.updateLegends(data: data)
-            }
-        }
+    func mapsglViewDidAddLayer(mapView: MapsGLView, layer: String) {
+        print("added layer: \(layer)")
+    }
+    
+    func mapsglViewDidRemoveLayer(mapView: MapsGLView, layer: String) {
+        print("removed layer: \(layer)")
     }
     
     func mapsglViewDidStartLoading(mapView: MapsGLView) {

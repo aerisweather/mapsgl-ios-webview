@@ -23,6 +23,8 @@ public class MapsGLLegendItem: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
+        layoutMargins = UIEdgeInsets(top: 4, left: 2, bottom: 2, right: 2)
+        
         titleLabel.font = .preferredFont(forTextStyle: .caption2)
         titleLabel.textColor = .black
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -39,7 +41,7 @@ public class MapsGLLegendItem: UIView {
         
         NSLayoutConstraint.activate([
             titleLabel.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor),
-            titleLabel.leftAnchor.constraint(equalTo: layoutMarginsGuide.leftAnchor),
+            titleLabel.leftAnchor.constraint(equalTo: layoutMarginsGuide.leftAnchor, constant: 4),
             titleLabel.rightAnchor.constraint(equalTo: layoutMarginsGuide.rightAnchor),
             imageView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 0),
             imageView.leftAnchor.constraint(equalTo: layoutMarginsGuide.leftAnchor),
@@ -57,6 +59,7 @@ public class MapsGLLegendItem: UIView {
 public class MapsGLLegendView: UIView {
     public var legends: [String: MapsGLLegendItem] = [:]
     public let stackView = UIStackView(frame: CGRect())
+    private var updateTask: DispatchWorkItem?
     
     override public init(frame: CGRect) {
         super.init(frame: frame)
@@ -95,14 +98,29 @@ public class MapsGLLegendView: UIView {
     public func removeLegend(key: String) {
         if let legendItem = legends[key] {
             stackView.removeArrangedSubview(legendItem)
+            legendItem.removeFromSuperview()
             legends[key] = nil
         }
+        
     }
     
     public func updateLegends(data: [[String: Any]]) {
-        for view in stackView.arrangedSubviews {
-            stackView.removeArrangedSubview(view)
+        updateTask?.cancel()
+          
+        let task = DispatchWorkItem { [weak self] in
+            DispatchQueue.global(qos: .userInteractive).async { [weak self] in
+                DispatchQueue.main.async {
+                    self?._updateLegends(data: data)
+                }
+            }
         }
+        
+        updateTask = task
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.1, execute: task)
+    }
+    
+    private func _updateLegends(data: [[String: Any]]) {
+        var keysToRemove: [String] = Array(legends.keys)
         
         if data.count > 0 {
             for item in data {
@@ -113,7 +131,15 @@ public class MapsGLLegendView: UIView {
                       let label = item["label"] as? String else { return }
                 
                 addLegend(key: key, label: label, image: image)
+                
+                if let index = keysToRemove.firstIndex(of: key) {
+                    keysToRemove.remove(at: index)
+                }
             }
+        }
+        
+        for key in keysToRemove {
+            removeLegend(key: key)
         }
     }
 }

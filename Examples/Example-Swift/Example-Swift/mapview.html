@@ -218,13 +218,13 @@
                     bridge.callHandler('onAddSource');
                 });
                 controller.on('layer:add', (e) => {
-                    bridge.callHandler('onAddLayer');
+                    bridge.callHandler('onAddLayer', { layer: e.layer.id });
                 });
                 controller.on('remove:add', (e) => {
                     bridge.callHandler('onRemoveSource');
                 });
                 controller.on('remove:add', (e) => {
-                    bridge.callHandler('onRemoveLayer');
+                    bridge.callHandler('onRemoveLayer', { layer: e.layer.id });
                 });
                 
                 const timeline = controller.timeline;
@@ -265,10 +265,12 @@
             bridge.registerHandler('addWeatherLayer', (data, responseCallback) => {
                 const { layer, options = {} } = data;
                 controller.addWeatherLayer(layer, options)
+                if (responseCallback) responseCallback(layer);
             });
             bridge.registerHandler('removeWeatherLayer', (data, responseCallback) => {
                 const { layer } = data;
-                controller.removeWeatherLayer(layer)
+                controller.removeWeatherLayer(layer);
+                if (responseCallback) responseCallback(layer);
             });
             bridge.registerHandler('hasWeatherLayer', (data, responseCallback) => {
                 const { layer } = data;

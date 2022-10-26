@@ -23,9 +23,10 @@ public enum MapViewError: Error {
     @objc optional func mapsglViewDidStartLoading(mapView: MapsGLView)
     @objc optional func mapsglViewDidCompleteLoading(mapView: MapsGLView)
     @objc optional func mapsglViewDidAddSource(mapView: MapsGLView)
-    @objc optional func mapsglViewDidAddLayer(mapView: MapsGLView)
+    @objc optional func mapsglViewDidAddLayer(mapView: MapsGLView, layer: String)
     @objc optional func mapsglViewDidRemoveSource(mapView: MapsGLView)
-    @objc optional func mapsglViewDidRemoveLayer(mapView: MapsGLView)
+    @objc optional func mapsglViewDidRemoveLayer(mapView: MapsGLView, layer: String)
+    @objc optional func mapsglViewDidUpdateLayers(mapView: MapsGLView)
     @objc optional func mapsglViewDidStartAnimating(mapView: MapsGLView)
     @objc optional func mapsglViewDidPauseAnimation(mapView: MapsGLView)
     @objc optional func mapsglViewDidResumeAnimation(mapView: MapsGLView)
@@ -45,6 +46,7 @@ public class MapsGLView: UIView {
     public let webView = WKWebView(frame: CGRect(), configuration: WKWebViewConfiguration())
     public weak var delegate: MapsGLViewDelegate?
     public var isAnimating = false
+    public var activeLayers: [String] = []
     
     private var bridge: WKWebViewJavascriptBridge!
     private let dateFormatter = DateFormatter()
@@ -177,14 +179,28 @@ public class MapsGLView: UIView {
             "layer": layer,
             "options": options
         ]
-        bridge.call(handlerName: "addWeatherLayer", data: data)
+        bridge.call(handlerName: "addWeatherLayer", data: data) { [weak self] _ in
+            self?.activeLayers.append(layer)
+            
+            if let view = self {
+                view.delegate?.mapsglViewDidUpdateLayers?(mapView: view)
+            }
+        }
     }
     
     public func removeWeatherLayer(_ layer: String) {
         let data: [String : Any] = [
             "layer": layer
         ]
-        bridge.call(handlerName: "removeWeatherLayer", data: data)
+        bridge.call(handlerName: "removeWeatherLayer", data: data) { [weak self] _ in
+            if let index = self?.activeLayers.firstIndex(of: layer) {
+                self?.activeLayers.remove(at: index)
+                
+                if let view = self {
+                    view.delegate?.mapsglViewDidUpdateLayers?(mapView: view)
+                }
+            }
+        }
     }
     
     // MARK: - Querying Features
@@ -326,16 +342,18 @@ public class MapsGLView: UIView {
             self?.delegate?.mapsglViewDidAddSource?(mapView: view)
         }
         bridge.register(handlerName: "onAddLayer") { [weak self] parameters, callback in
-            guard let view = self else { return }
-            self?.delegate?.mapsglViewDidAddLayer?(mapView: view)
+            guard let view = self,
+                  let layer = parameters?["layer"] as? String else { return }
+            self?.delegate?.mapsglViewDidAddLayer?(mapView: view, layer: layer)
         }
         bridge.register(handlerName: "onRemoveSource") { [weak self] parameters, callback in
             guard let view = self else { return }
             self?.delegate?.mapsglViewDidRemoveSource?(mapView: view)
         }
         bridge.register(handlerName: "onRemoveLayer") { [weak self] parameters, callback in
-            guard let view = self else { return }
-            self?.delegate?.mapsglViewDidRemoveLayer?(mapView: view)
+            guard let view = self,
+                  let layer = parameters?["layer"] as? String else { return }
+            self?.delegate?.mapsglViewDidRemoveLayer?(mapView: view, layer: layer)
         }
         bridge.register(handlerName: "onAnimationStart") { [weak self] parameters, callback in
             guard let view = self else { return }
