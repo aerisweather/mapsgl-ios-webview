@@ -147,8 +147,15 @@ public class MapsGLView: UIView {
     
     // MARK: - Weather Layers
     
-    public func hasWeatherLayer(_ layer: String) -> Bool {
-        return false
+    public func hasWeatherLayer(_ layer: String, _ callback: @escaping (Bool) -> Void) {
+        let data: [String : Any] = [
+            "layer": layer
+        ]
+        bridge.call(handlerName: "hasWeatherLayer", data: data) { (response) in
+            if let result = response as? Bool {
+                callback(result)
+            }
+        }
     }
     
     public func addWeatherLayer(_ layer: String, options: MapsGLLayerOptions = [:]) {

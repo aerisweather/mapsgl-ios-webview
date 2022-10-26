@@ -14,12 +14,14 @@ class ViewController: UIViewController {
     var mapView: MapsGLView!
     var legendView: MapsGLLegendView!
     let toolbarView = MapToolbarView()
+    private var optionsController: UINavigationController!
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
         let account = MapsGLAccount(id: "wgE96YE3scTQLKjnqiMsv", secret: "2Hv7vYXBj0YAJED8xaiADX5X1szKbLFhd9waCEWT")
-        let configuration = MapsGLConfiguration(account: account)
+        var configuration = MapsGLConfiguration(account: account)
+        configuration.animation.pauseWhileLoading = true
         
         mapView = MapsGLView(config: configuration, frame: view.bounds)
         mapView.delegate = self
@@ -30,6 +32,7 @@ class ViewController: UIViewController {
         view.addSubview(legendView)
         
         toolbarView.playButton.addTarget(mapView, action: #selector(MapsGLView.toggle), for: .touchUpInside)
+        toolbarView.layersButton.addTarget(self, action: #selector(ViewController.showOptions), for: .touchUpInside)
         toolbarView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(toolbarView)
         
@@ -41,6 +44,37 @@ class ViewController: UIViewController {
             toolbarView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
             toolbarView.heightAnchor.constraint(equalToConstant: 44)
         ])
+        
+        let optionsController = MapOptionsViewController()
+        optionsController.delegate = self
+        
+        let optionsNavigationController = UINavigationController(rootViewController: optionsController)
+        if #available(iOS 15, *) {
+            let appearance = UINavigationBarAppearance()
+            appearance.configureWithOpaqueBackground()
+            optionsNavigationController.navigationBar.standardAppearance = appearance
+            optionsNavigationController.navigationBar.scrollEdgeAppearance = appearance
+        }
+        self.optionsController = optionsNavigationController
+    }
+    
+    @objc func showOptions() {
+        present(optionsController, animated: true)
+    }
+}
+
+extension ViewController: MapOptionsViewControllerDelegate {
+    
+    func mapOptionsViewControllerDidAddLayers(layers: [String]) {
+        for layer in layers {
+            mapView.addWeatherLayer(layer)
+        }
+    }
+    
+    func mapOptionsViewControllerDidRemoveLayers(layers: [String]) {
+        for layer in layers {
+            mapView.removeWeatherLayer(layer)
+        }
     }
 }
 
@@ -62,9 +96,11 @@ extension ViewController: MapsGLViewDelegate {
 //                ]
 //            ]
 //        ])
-        mapView.addWeatherLayer("wind-dir")
+//        mapView.addWeatherLayer("wind-dir")
 //        mapView.addWeatherLayer("wind-particles")
-        mapView.getBounds()
+        mapView.getBounds { bounds in
+            print(bounds)
+        }
         
 //        mapView.setCenter(CLLocationCoordinate2D(latitude: 47.5, longitude: -121.5))
         mapView.setZoom(0)

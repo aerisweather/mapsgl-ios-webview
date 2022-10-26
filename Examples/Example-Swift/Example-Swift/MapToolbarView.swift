@@ -9,6 +9,7 @@ import UIKit
 
 class MapToolbarView: UIView {
     let playButton = UIButton(type: .custom)
+    let layersButton = UIButton(type: .custom)
     let timeLabel = UILabel()
     let activityIndicator = UIActivityIndicatorView(style: .medium)
     
@@ -26,6 +27,11 @@ class MapToolbarView: UIView {
         playButton.translatesAutoresizingMaskIntoConstraints = false
         addSubview(playButton)
         
+        layersButton.setImage(UIImage(systemName: "square.3.layers.3d.top.filled", withConfiguration: iconConfiguration), for: .normal)
+        layersButton.tintColor = .white
+        layersButton.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(layersButton)
+        
         activityIndicator.color = .white
         activityIndicator.translatesAutoresizingMaskIntoConstraints = false
         addSubview(activityIndicator)
@@ -42,9 +48,11 @@ class MapToolbarView: UIView {
             activityIndicator.leftAnchor.constraint(equalTo: playButton.rightAnchor, constant: 20),
             activityIndicator.centerYAnchor.constraint(equalTo: centerYAnchor),
             timeLabel.leftAnchor.constraint(equalTo: activityIndicator.rightAnchor, constant: 12),
-            timeLabel.rightAnchor.constraint(equalTo: layoutMarginsGuide.rightAnchor),
             timeLabel.centerYAnchor.constraint(equalTo: centerYAnchor),
-            timeLabel.widthAnchor.constraint(equalToConstant: 165)
+            timeLabel.widthAnchor.constraint(equalToConstant: 165),
+            layersButton.leftAnchor.constraint(equalTo: timeLabel.rightAnchor, constant: 20),
+            layersButton.rightAnchor.constraint(equalTo: layoutMarginsGuide.rightAnchor),
+            layersButton.centerYAnchor.constraint(equalTo: centerYAnchor)
         ])
     }
     

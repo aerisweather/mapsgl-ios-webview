@@ -270,6 +270,11 @@
                 const { layer } = data;
                 controller.removeWeatherLayer(layer)
             });
+            bridge.registerHandler('hasWeatherLayer', (data, responseCallback) => {
+                const { layer } = data;
+                const result = controller.hasWeatherLayer(layer)
+                responseCallback(result);
+            });
             bridge.registerHandler('query', (data, responseCallback) => {
                 log('query', data);
                 controller.queryPromise(data).then((result) => {

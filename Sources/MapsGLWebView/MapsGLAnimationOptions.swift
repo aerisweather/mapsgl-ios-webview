@@ -16,6 +16,7 @@ public struct MapsGLAnimationOptions {
     public var autoplay: Bool
     public var enableRepeat: Bool
     public var enabled: Bool
+    public var pauseWhileLoading: Bool
     
     private let dateFormatter = DateFormatter()
     
@@ -28,6 +29,7 @@ public struct MapsGLAnimationOptions {
         self.autoplay = false
         self.enableRepeat = true
         self.enabled = true
+        self.pauseWhileLoading = false
     }
     
     public func toDictionary() -> [String: Any] {
@@ -41,7 +43,8 @@ public struct MapsGLAnimationOptions {
             "endDelay": endDelay,
             "repeat": enableRepeat,
             "enabled": enabled,
-            "autoplay": autoplay
+            "autoplay": autoplay,
+            "pauseWhileLoading": pauseWhileLoading
         ]
     }
 }
