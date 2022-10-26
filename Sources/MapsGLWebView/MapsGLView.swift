@@ -16,7 +16,6 @@ public enum MapViewError: Error {
 
 @objc public protocol MapsGLViewDelegate: AnyObject {
     @objc optional func mapsglViewDidLoad(mapView: MapsGLView)
-    @objc optional func onReady()
     @objc optional func mapsglViewDidZoom(mapView: MapsGLView)
     @objc optional func mapsglViewDidMove(mapView: MapsGLView)
     @objc optional func mapsglViewDidReceiveClick(mapView: MapsGLView, coordinate: CLLocationCoordinate2D)
@@ -94,6 +93,14 @@ public class MapsGLView: UIView {
         }
     }
     
+    public func getCenter() async -> CLLocationCoordinate2D {
+        await withCheckedContinuation({ continuation in
+            getCenter { center in
+                continuation.resume(returning: center)
+            }
+        })
+    }
+    
     public func setCenter(_ coordinate: CLLocationCoordinate2D) {
         let data = [
             "lat": coordinate.latitude,
@@ -108,6 +115,14 @@ public class MapsGLView: UIView {
                 callback(zoom)
             }
         }
+    }
+    
+    public func getZoom() async -> Float {
+        await withCheckedContinuation({ continuation in
+            getZoom { zoom in
+                continuation.resume(returning: zoom)
+            }
+        })
     }
     
     public func setZoom(_ zoom: Float) {
@@ -129,12 +144,28 @@ public class MapsGLView: UIView {
         }
     }
     
+    public func getBounds() async -> CoordinateBounds {
+        await withCheckedContinuation({ continuation in
+            getBounds { bounds in
+                continuation.resume(returning: bounds)
+            }
+        })
+    }
+    
     public func getBearing(_ callback: @escaping (Float) -> Void) {
         bridge.call(handlerName: "getBearing") { (response) in
             if let bearing = response as? Float {
                 callback(bearing)
             }
         }
+    }
+    
+    public func getBearing() async -> Float {
+        await withCheckedContinuation({ continuation in
+            getBearing { bearing in
+                continuation.resume(returning: bearing)
+            }
+        })
     }
     
     public func getPitch(_ callback: @escaping (Float) -> Void) {
@@ -145,6 +176,14 @@ public class MapsGLView: UIView {
         }
     }
     
+    public func getPitch() async -> Float {
+        await withCheckedContinuation({ continuation in
+            getPitch { pitch in
+                continuation.resume(returning: pitch)
+            }
+        })
+    }
+    
     public func getFov(_ callback: @escaping (Float) -> Void) {
         bridge.call(handlerName: "getFov") { (response) in
             if let fov = response as? Float {
@@ -153,12 +192,28 @@ public class MapsGLView: UIView {
         }
     }
     
+    public func getFov() async -> Float {
+        await withCheckedContinuation({ continuation in
+            getFov { fov in
+                continuation.resume(returning: fov)
+            }
+        })
+    }
+    
     public func getLegend(_ callback: @escaping ([AnyObject]) -> Void) {
         bridge.call(handlerName: "getLegend") { (response) in
             if let result = response as? [AnyObject] {
                 callback(result)
             }
         }
+    }
+    
+    public func getLegend() async -> [AnyObject] {
+        await withCheckedContinuation({ continuation in
+            getLegend { result in
+                continuation.resume(returning: result)
+            }
+        })
     }
     
     // MARK: - Weather Layers
@@ -172,6 +227,14 @@ public class MapsGLView: UIView {
                 callback(result)
             }
         }
+    }
+    
+    public func hasWeatherLayer(_ layer: String) async -> Bool {
+        await withCheckedContinuation({ continuation in
+            hasWeatherLayer(layer) { result in
+                continuation.resume(returning: result)
+            }
+        })
     }
     
     public func addWeatherLayer(_ layer: String, options: MapsGLLayerOptions = [:]) {

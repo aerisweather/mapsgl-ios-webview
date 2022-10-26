@@ -102,9 +102,12 @@ extension ViewController: MapsGLViewDelegate {
         mapView.getBounds { bounds in
             print(bounds)
         }
+        mapView.getCenter { center in
+            print(center)
+        }
         
-//        mapView.setCenter(CLLocationCoordinate2D(latitude: 47.5, longitude: -121.5))
-        mapView.setZoom(0)
+        mapView.setCenter(CLLocationCoordinate2D(latitude: 47.5, longitude: -121.5))
+        mapView.setZoom(2)
         
     }
     
