@@ -84,7 +84,7 @@ extension ViewController: MapsGLViewDelegate {
         print("loaded")
         
         mapView.getTimelineCurrentDate { [weak self] date in
-            self?.toolbarView.timeLabel.text = date.formatted()
+            self?.toolbarView.update(date: date)
         }
         
 //        mapView.addWeatherLayer("temperatures", options: [
@@ -105,13 +105,6 @@ extension ViewController: MapsGLViewDelegate {
 //        mapView.setCenter(CLLocationCoordinate2D(latitude: 47.5, longitude: -121.5))
         mapView.setZoom(0)
         
-//        let delay = DispatchTime.now() + 3.0
-//        DispatchQueue.main.asyncAfter(deadline: delay, execute: {
-//            mapView.setZoom(0)
-//            mapView.query(coordinate: CLLocationCoordinate2D(latitude: 47.5, longitude: -121.5)) { result in
-//                print(result)
-//            }
-//        })
     }
     
     func mapsglViewDidReceiveClick(mapView: MapsGLView, coordinate: CLLocationCoordinate2D) {
@@ -154,7 +147,7 @@ extension ViewController: MapsGLViewDelegate {
     }
     
     func mapsglViewDidAdvanceAnimation(mapView: MapsGLView, progress: Double, date: Date) {
-        toolbarView.timeLabel.text = date.formatted()
+        toolbarView.update(date: date)
     }
 }
 

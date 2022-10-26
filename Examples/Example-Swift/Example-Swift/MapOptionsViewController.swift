@@ -117,6 +117,5 @@ extension MapOptionsViewController: UITableViewDelegate {
         
         cell?.accessoryType = selected ? .checkmark : .none
         tableView.deselectRow(at: indexPath, animated: true)
-//        let item = items[indexPath.item]
     }
 }
