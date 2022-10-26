@@ -35,6 +35,11 @@ public enum MapViewError: Error {
 
 public typealias MapsGLLayerOptions = [String: Any]
 
+public struct CoordinateBounds {
+    var northwest: CLLocationCoordinate2D
+    var southeast: CLLocationCoordinate2D
+}
+
 public class MapsGLView: UIView {
     public var configuration: MapsGLConfiguration
     public let webView = WKWebView(frame: CGRect(), configuration: WKWebViewConfiguration())
@@ -107,9 +112,18 @@ public class MapsGLView: UIView {
         bridge.call(handlerName: "setZoom", data: [ "zoom": zoom ])
     }
     
-    public func getBounds() {
+    public func getBounds(_ callback: @escaping (CoordinateBounds) -> Void) {
         bridge.call(handlerName: "getBounds") { (response) in
-            print(response)
+            if let data = response as? [String: Any],
+               let north = data["north"] as? Double,
+               let south = data["south"] as? Double,
+               let west = data["west"] as? Double,
+               let east = data["east"] as? Double
+            {
+                let nw = CLLocationCoordinate2D(latitude: north, longitude: west)
+                let se = CLLocationCoordinate2D(latitude: south, longitude: east)
+                callback(CoordinateBounds(northwest: nw, southeast: se))
+            }
         }
     }
     
