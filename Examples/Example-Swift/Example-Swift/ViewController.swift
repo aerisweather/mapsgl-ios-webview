@@ -27,7 +27,7 @@ class ViewController: UIViewController {
         mapView.delegate = self
         view.addSubview(mapView)
         
-        legendView = MapsGLLegendView(frame: CGRect(x: 0, y: 0, width: view.bounds.width, height: 100.0))
+        legendView = mapView.legendView
         legendView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(legendView)
         
@@ -119,12 +119,13 @@ extension ViewController: MapsGLViewDelegate {
     }
     
     func mapsglViewDidUpdateLayers(mapView: MapsGLView) {
+        print("layers updated: \(mapView.activeLayers)")
         toolbarView.playButton.isEnabled = mapView.activeLayers.count > 0
-        mapView.getLegend { [weak self] result in
-            if let data = result as? [[String: Any]] {
-                self?.legendView.updateLegends(data: data)
-            }
-        }
+    }
+    
+    func mapsglViewDidUpdateLegends(mapView: MapsGLView) {
+        print("legends updated")
+        mapView.updateLegends()
     }
     
     func mapsglViewDidAddLayer(mapView: MapsGLView, layer: String) {

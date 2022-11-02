@@ -226,6 +226,10 @@
                 controller.on('remove:add', (e) => {
                     bridge.callHandler('onRemoveLayer', { layer: e.layer.id });
                 });
+
+                controller.controls.legend?.on('update', () => {
+                    bridge.callHandler('onLegendUpdate');
+                });
                 
                 const timeline = controller.timeline;
                 timeline.on('play', () => {

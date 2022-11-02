@@ -26,6 +26,7 @@ public enum MapViewError: Error {
     @objc optional func mapsglViewDidRemoveSource(mapView: MapsGLView)
     @objc optional func mapsglViewDidRemoveLayer(mapView: MapsGLView, layer: String)
     @objc optional func mapsglViewDidUpdateLayers(mapView: MapsGLView)
+    @objc optional func mapsglViewDidUpdateLegends(mapView: MapsGLView)
     @objc optional func mapsglViewDidStartAnimating(mapView: MapsGLView)
     @objc optional func mapsglViewDidPauseAnimation(mapView: MapsGLView)
     @objc optional func mapsglViewDidResumeAnimation(mapView: MapsGLView)
@@ -43,12 +44,14 @@ public struct CoordinateBounds {
 public class MapsGLView: UIView {
     public var configuration: MapsGLConfiguration
     public let webView = WKWebView(frame: CGRect(), configuration: WKWebViewConfiguration())
+    public let legendView = MapsGLLegendView(frame: CGRect())
     public weak var delegate: MapsGLViewDelegate?
     public var isAnimating = false
     public var activeLayers: [String] = []
     
     private var bridge: WKWebViewJavascriptBridge!
     private let dateFormatter = DateFormatter()
+    private var updateLegendsTask: DispatchWorkItem?
     
     convenience public init(config: MapsGLConfiguration, frame: CGRect) {
         self.init(frame: frame)
@@ -337,6 +340,32 @@ public class MapsGLView: UIView {
         bridge.call(handlerName: "timeline.restart", data: [:])
     }
     
+    // MARK: - Legends
+    
+    public func updateLegends() {
+        updateLegendsTask?.cancel()
+          
+        let task = DispatchWorkItem { [weak self] in
+            DispatchQueue.global(qos: .userInteractive).async { [weak self] in
+                DispatchQueue.main.async {
+                    self?._updateLegends()
+                }
+            }
+        }
+        
+        updateLegendsTask = task
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.1, execute: task)
+    }
+    
+    private func _updateLegends() {
+        print("updateLegends: \(activeLayers)")
+        getLegend { [weak self] result in
+            if let data = result as? [[String: Any]] {
+                self?.legendView.updateLegends(data: data)
+            }
+        }
+    }
+    
     // MARK: - Private
 
     private func loadMapView() {
@@ -417,6 +446,10 @@ public class MapsGLView: UIView {
             guard let view = self,
                   let layer = parameters?["layer"] as? String else { return }
             self?.delegate?.mapsglViewDidRemoveLayer?(mapView: view, layer: layer)
+        }
+        bridge.register(handlerName: "onLegendUpdate") { [weak self] parameters, callback in
+            guard let view = self else { return }
+            self?.delegate?.mapsglViewDidUpdateLegends?(mapView: view)
         }
         bridge.register(handlerName: "onAnimationStart") { [weak self] parameters, callback in
             guard let view = self else { return }

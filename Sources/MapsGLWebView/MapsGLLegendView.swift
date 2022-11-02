@@ -18,6 +18,12 @@ public class MapsGLLegendItem: UIView {
         self.key = key
         self.titleLabel.text = label
         self.imageView.image = image
+        
+        let height = image.size.height / UIScreen.main.scale
+        
+        NSLayoutConstraint.activate([
+            imageView.heightAnchor.constraint(equalToConstant: height)
+        ])
     }
     
     override init(frame: CGRect) {
@@ -46,8 +52,7 @@ public class MapsGLLegendItem: UIView {
             imageView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 0),
             imageView.leftAnchor.constraint(equalTo: layoutMarginsGuide.leftAnchor),
             imageView.rightAnchor.constraint(equalTo: layoutMarginsGuide.rightAnchor),
-            imageView.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor),
-            imageView.heightAnchor.constraint(equalToConstant: 22)
+            imageView.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor)
         ])
     }
     
@@ -105,21 +110,6 @@ public class MapsGLLegendView: UIView {
     }
     
     public func updateLegends(data: [[String: Any]]) {
-        updateTask?.cancel()
-          
-        let task = DispatchWorkItem { [weak self] in
-            DispatchQueue.global(qos: .userInteractive).async { [weak self] in
-                DispatchQueue.main.async {
-                    self?._updateLegends(data: data)
-                }
-            }
-        }
-        
-        updateTask = task
-        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.1, execute: task)
-    }
-    
-    private func _updateLegends(data: [[String: Any]]) {
         var keysToRemove: [String] = Array(legends.keys)
         
         if data.count > 0 {
@@ -130,13 +120,22 @@ public class MapsGLLegendView: UIView {
                       let key = item["key"] as? String,
                       let label = item["label"] as? String else { return }
                 
-                addLegend(key: key, label: label, image: image)
+                let index = keysToRemove.firstIndex(of: key)
                 
-                if let index = keysToRemove.firstIndex(of: key) {
+                // remove existing item if one exists for the key
+                if let _ = index {
+                    removeLegend(key: key)
+                }
+                
+                addLegend(key: key, label: label, image: image)
+                print("added legend: \(key)")
+                
+                if let index = index {
                     keysToRemove.remove(at: index)
                 }
             }
         }
+        print(keysToRemove)
         
         for key in keysToRemove {
             removeLegend(key: key)
