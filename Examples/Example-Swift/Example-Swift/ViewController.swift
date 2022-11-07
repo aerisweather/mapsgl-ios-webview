@@ -22,6 +22,8 @@ class ViewController: UIViewController {
         let account = MapsGLAccount(id: "wgE96YE3scTQLKjnqiMsv", secret: "2Hv7vYXBj0YAJED8xaiADX5X1szKbLFhd9waCEWT")
         var configuration = MapsGLConfiguration(account: account)
         configuration.animation.pauseWhileLoading = true
+        configuration.centerCoordinate = CLLocationCoordinate2D(latitude: 35, longitude: -90)
+        configuration.zoomLevel = 4
         
         mapView = MapsGLView(config: configuration, frame: view.bounds)
         mapView.delegate = self
@@ -105,9 +107,9 @@ extension ViewController: MapsGLViewDelegate {
         mapView.getCenter { center in
             print(center)
         }
-        
-        mapView.setCenter(CLLocationCoordinate2D(latitude: 47.5, longitude: -121.5))
-        mapView.setZoom(2)
+//
+//        mapView.setCenter(CLLocationCoordinate2D(latitude: 47.5, longitude: -121.5))
+//        mapView.setZoom(2)
         
     }
     

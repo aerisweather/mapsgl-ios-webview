@@ -170,6 +170,9 @@
                 log('setting up map', data);
                 const { account: accountConfig, animation: animationConfig = {} } = data;
                 const account = new aerisweather.mapsgl.Account(accountConfig.id, accountConfig.secret);
+                
+                const center = data.center;
+                const zoom = data.zoom;
 
                 if (animationConfig.start) {
                     animationConfig.start = new Date(animationConfig.start);    
@@ -185,6 +188,9 @@
                 controller.addLegendControl(document.getElementById('legend'), {
                     width: 300
                 });
+                
+                controller.setCenter({ lat: center.lat, lon: center.lon });
+                controller.setZoom(zoom);
 
                 controller.on('load', () => {
                     log('MapsGL controller ready');

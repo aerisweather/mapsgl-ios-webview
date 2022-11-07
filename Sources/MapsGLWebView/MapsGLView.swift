@@ -388,11 +388,16 @@ public class MapsGLView: UIView {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ"
         
-        let config = [
+        let config: [String: Any] = [
             "account": [
                 "id": configuration.account.id,
                 "secret": configuration.account.secret
             ],
+            "center": [
+                "lat": configuration.centerCoordinate.latitude,
+                "lon": configuration.centerCoordinate.longitude
+            ],
+            "zoom": configuration.zoomLevel,
             "animation": configuration.animation.toDictionary()
         ]
         bridge.call(handlerName: "configureMap", data: config)
