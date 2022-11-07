@@ -13,7 +13,7 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/Lision/WKWebViewJavascriptBridge.git", from: "1.2.0")
+        .package(url: "https://github.com/Lision/WKWebViewJavascriptBridge.git", branch: "master")
     ],
     targets: [
         .target(
