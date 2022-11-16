@@ -78,7 +78,9 @@ func mapsglViewDidAdvanceAnimation(mapView: MapsGLView, progress: Double, date: 
 
 ## Example App
 
-Review the example apps for Swift and SwiftUI in the `Examples` directory of this repository for more in-depth examples of how to use many of the features provided by MapsGLWebView. These example projects demonstrate how to set up your MapsGLView instance, how to use MapsGLViewDelegate, include a legend view, and how to implement native controls for your MapsGLView.
+Review the example apps for Swift and SwiftUI (coming soon) in the `Examples` directory of this repository for more in-depth examples of how to use many of the features provided by MapsGLWebView. These example projects demonstrate how to set up your MapsGLView instance, how to use MapsGLViewDelegate, include a legend view, and how to implement native controls for your MapsGLView.
+
+Note that you will need to update the code in these example apps to provide your AerisWeather account keys in order for MapsGL functionality to work. You'll see lines like `MapsGLAccount(id: "CLIENT_ID", secret: "CLIENT_SECRET")` that you will need to update with your account access keys.
 
 ## Customization
 

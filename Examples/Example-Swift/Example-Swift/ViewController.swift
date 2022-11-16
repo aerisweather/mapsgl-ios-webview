@@ -19,7 +19,7 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let account = MapsGLAccount(id: "wgE96YE3scTQLKjnqiMsv", secret: "2Hv7vYXBj0YAJED8xaiADX5X1szKbLFhd9waCEWT")
+        let account = MapsGLAccount(id: "CLIENT_ID", secret: "CLIENT_SECRET")
         var configuration = MapsGLConfiguration(account: account)
         configuration.animation.pauseWhileLoading = true
         configuration.centerCoordinate = CLLocationCoordinate2D(latitude: 35, longitude: -90)
