@@ -82,6 +82,8 @@ Review the example apps for Swift and SwiftUI (coming soon) in the `Examples` di
 
 Note that you will need to update the code in these example apps to provide your AerisWeather account keys in order for MapsGL functionality to work. You'll see lines like `MapsGLAccount(id: "CLIENT_ID", secret: "CLIENT_SECRET")` that you will need to update with your account access keys.
 
+The example apps are also set up to use Mapbox for the base map in `mapview.html`. If you wish to use Mapbox, you'll need to update `mapview.html` with your Mapbox access token. Otherwise, you can use a different mapping library as described in the "Customization" section below.
+
 ## Customization
 
 If you're looking for even more customization options beyond what's supported by this MapsGLWebView package, you can clone this repo and update the included `mapview.html` file with additional configurations and options supported by our core [MapsGL Javascript SDK](https://www.aerisweather.com/docs/mapsgl/). 
