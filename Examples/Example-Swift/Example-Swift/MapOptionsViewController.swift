@@ -31,6 +31,7 @@ class MapOptionsViewController: UIViewController {
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Close", style: .plain, target: self, action: #selector(self.close))
         
         items = [
+            Layer(code: "radar", title: "Radar"),
             Layer(code: "temperatures", title: "Temperatures"),
             Layer(code: "wind-speeds", title: "Wind Speeds"),
             Layer(code: "wind-particles", title: "Wind Particles"),

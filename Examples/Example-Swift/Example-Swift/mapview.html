@@ -7,6 +7,7 @@
             height: 100%;
             margin: 0;
             padding: 0;
+            background: #000;
         }
         #app {
             position: absolute;
@@ -14,7 +15,6 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: #000;
             height: 100%;
             width: 100%;
             z-index: 1;
@@ -33,8 +33,8 @@
     <link href="https://api.mapbox.com/mapbox-gl-js/v2.8.0/mapbox-gl.css" rel="stylesheet">
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.8.0/mapbox-gl.js"></script>
 
-    <link rel="stylesheet" href="https://cdn.aerisapi.com/sdk/js/mapsgl/1.1.0/aerisweather.mapsgl.css">
-    <script src="https://cdn.aerisapi.com/sdk/js/mapsgl/1.1.0/aerisweather.mapsgl.js"></script>
+    <link rel="stylesheet" href="https://cdn.aerisapi.com/sdk/js/mapsgl/latest/aerisweather.mapsgl.css">
+    <script src="https://cdn.aerisapi.com/sdk/js/mapsgl/latest/aerisweather.mapsgl.js"></script>
 </head>
 
 <body>
@@ -56,7 +56,7 @@
                 return window.WKWVJBCallbacks.push(callback);
             }
             window.WKWVJBCallbacks = [callback];
-            window.webkit.messageHandlers.iOS_Native_InjectJavascript.postMessage(null)
+            window.webkit.messageHandlers.iOS_Native_InjectJavascript.postMessage(null);
         }
 
         const unproject = (x, y, zoom, center, size) => {
@@ -102,7 +102,7 @@
                 bridge.callHandler('log', { message, data, type });
             };
 
-            mapboxgl.accessToken = 'MAPBOX_TOKEN;
+            mapboxgl.accessToken = 'MAPBOX_TOKEN';
             const map = new mapboxgl.Map({
                 container: document.getElementById('app'),
                 style: 'mapbox://styles/mapbox/light-v9',
